@@ -89,6 +89,7 @@ class ProfileView(APIView):
         profile = serializer.save()
 
         if 'resume_file' in request.FILES:
+            from embeddings import generate_embedding
             profile.resume_file.seek(0)
             profile.resume_text = extract_pdf_text(profile.resume_file)
             profile.save(update_fields=['resume_text'])
@@ -103,5 +104,9 @@ class ProfileView(APIView):
                         update_fields.append(field)
                 if update_fields:
                     profile.save(update_fields=update_fields)
+
+            if profile.resume_text:
+                profile.resume_embedding = generate_embedding(profile.resume_text)
+                profile.save(update_fields=['resume_embedding'])
 
         return Response(CandidateProfileSerializer(profile).data)

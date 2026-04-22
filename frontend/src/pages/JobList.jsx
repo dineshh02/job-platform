@@ -2,15 +2,23 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getJobs, applyToJob, getApplications } from '../api'
 
+function scoreBadge(score) {
+  const bg = score >= 70 ? '#dcfce7' : score >= 40 ? '#fef9c3' : '#f3f4f6'
+  const color = score >= 70 ? '#15803d' : score >= 40 ? '#854d0e' : '#6b7280'
+  return { display: 'inline-block', padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: bg, color, marginBottom: 8 }
+}
+
 export default function JobList() {
+  const isCandidate = localStorage.getItem('role') === 'candidate'
   const [jobs, setJobs] = useState([])
   const [applied, setApplied] = useState({})
   const [errors, setErrors] = useState({})
+  const [sortRelevance, setSortRelevance] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const isCandidate = localStorage.getItem('role') === 'candidate'
-    Promise.all([getJobs(), isCandidate ? getApplications() : Promise.resolve({ data: [] })])
+  const loadJobs = (sort) => {
+    const sortParam = sort ? 'relevance' : undefined
+    Promise.all([getJobs(sortParam), isCandidate ? getApplications() : Promise.resolve({ data: [] })])
       .then(([jobsRes, appsRes]) => {
         setJobs(jobsRes.data)
         const alreadyApplied = {}
@@ -18,7 +26,15 @@ export default function JobList() {
         setApplied(alreadyApplied)
       })
       .catch(() => { localStorage.clear(); navigate('/login') })
-  }, [])
+  }
+
+  useEffect(() => { loadJobs(false) }, [])
+
+  const toggleSort = () => {
+    const next = !sortRelevance
+    setSortRelevance(next)
+    loadJobs(next)
+  }
 
   const handleApply = async (jobId) => {
     try {
@@ -38,19 +54,29 @@ export default function JobList() {
       <div style={s.header}>
         <h2>Available Jobs</h2>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => navigate('/profile')} style={s.profileBtn}>My Profile</button>
+          {isCandidate && (
+            <button onClick={toggleSort} style={sortRelevance ? s.sortActive : s.sortBtn}>
+              {sortRelevance ? '✓ Best Match' : 'Sort by Match'}
+            </button>
+          )}
+          {isCandidate && <button onClick={() => navigate('/profile')} style={s.profileBtn}>My Profile</button>}
           <button onClick={() => { localStorage.clear(); navigate('/login') }} style={s.logout}>Logout</button>
         </div>
       </div>
       {jobs.length === 0 && <p>No jobs available yet.</p>}
       {jobs.map(job => (
         <div key={job.id} style={s.card}>
-          <h3 style={{ margin: '0 0 4px' }}>{job.title}</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <h3 style={{ margin: '0 0 4px' }}>{job.title}</h3>
+            {job.match_score !== null && job.match_score !== undefined && (
+              <span style={scoreBadge(job.match_score)}>{job.match_score}% match</span>
+            )}
+          </div>
           <p style={s.company}>{job.company}</p>
           <p style={s.desc}>{job.description}</p>
           {applied[job.id]
             ? <span style={s.success}>✓ Applied</span>
-            : <button onClick={() => handleApply(job.id)} style={s.applyBtn}>Apply</button>
+            : isCandidate && <button onClick={() => handleApply(job.id)} style={s.applyBtn}>Apply</button>
           }
           {errors[job.id] && <p style={s.error}>{errors[job.id]}</p>}
         </div>
@@ -68,6 +94,8 @@ const s = {
   applyBtn: { padding: '6px 16px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
   logout: { padding: '6px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
   profileBtn: { padding: '6px 12px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
+  sortBtn: { padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, cursor: 'pointer' },
+  sortActive: { padding: '6px 12px', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: 4, cursor: 'pointer', fontWeight: 600 },
   success: { color: '#16a34a', fontWeight: 600 },
   error: { color: 'red', fontSize: 13, marginTop: 4 },
 }

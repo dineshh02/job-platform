@@ -10,7 +10,7 @@ api.interceptors.request.use(config => {
 
 export const signup = (data) => api.post('/api/auth/signup/', data)
 export const login = (data) => api.post('/api/auth/login/', data)
-export const getJobs = () => api.get('/api/jobs/')
+export const getJobs = (sort) => api.get('/api/jobs/' + (sort ? `?sort=${sort}` : ''))
 export const createJob = (data) => api.post('/api/jobs/create/', data)
 export const applyToJob = (jobId) => api.post('/api/applications/', { job: jobId })
 export const getApplications = () => api.get('/api/applications/')

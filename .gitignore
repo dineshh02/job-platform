@@ -6,7 +6,7 @@ __pycache__/
 *.pyd
 *.env
 *.sqlite3
-
+.claude/
 # Django
 backend/staticfiles/
 backend/media/

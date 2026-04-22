@@ -5,13 +5,33 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Job, Application
 from .serializers import JobSerializer, ApplicationSerializer
 from .permissions import IsHR, IsCandidate
+from embeddings import generate_embedding, cosine_similarity
 
 
 class JobListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        jobs = Job.objects.all().order_by('-created_at')
+        jobs = list(Job.objects.all().order_by('-created_at'))
+        sort = request.query_params.get('sort')
+        profile_embedding = None
+
+        if sort == 'relevance' and request.user.role == 'candidate':
+            try:
+                profile_embedding = request.user.profile.resume_embedding
+            except Exception:
+                pass
+
+        for job in jobs:
+            if profile_embedding and job.description_embedding:
+                score = cosine_similarity(profile_embedding, job.description_embedding)
+                job.match_score = round(score * 100)
+            else:
+                job.match_score = None
+
+        if sort == 'relevance' and profile_embedding:
+            jobs.sort(key=lambda j: j.match_score or 0, reverse=True)
+
         return Response(JobSerializer(jobs, many=True).data)
 
 
@@ -21,8 +41,10 @@ class JobCreateView(APIView):
     def post(self, request):
         serializer = JobSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(created_by=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        job = serializer.save(created_by=request.user)
+        job.description_embedding = generate_embedding(f"{job.title} {job.description}")
+        job.save(update_fields=['description_embedding'])
+        return Response(JobSerializer(job).data, status=status.HTTP_201_CREATED)
 
 
 class ApplyView(APIView):

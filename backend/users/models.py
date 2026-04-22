@@ -18,6 +18,7 @@ class CandidateProfile(models.Model):
     resume_file = models.FileField(upload_to='resumes/', null=True, blank=True)
     resume_text = models.TextField(blank=True)
     years_of_experience = models.IntegerField(null=True, blank=True)
+    resume_embedding = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return f"Profile({self.user.email})"

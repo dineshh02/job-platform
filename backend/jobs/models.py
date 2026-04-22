@@ -8,6 +8,7 @@ class Job(models.Model):
     company = models.CharField(max_length=200)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='jobs')
     created_at = models.DateTimeField(auto_now_add=True)
+    description_embedding = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.title
