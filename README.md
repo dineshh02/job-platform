@@ -239,7 +239,10 @@ job-platform/
 
 ## Known Limitations
 
-See [`missing.md`](./missing.md) for a full, transparent list of what's intentionally scoped out and what should harden before production (secrets handling, `DEBUG=True`, rate limiting, frontend tests, CI, etc.).
+- Some of the limitations are curretly that we only allow PDFs as input resume
+- Not having many fields for user profile
+- Not yet added linters 
+- Gemini API is on free quota so might crash or maybe rate limited
 
 ---
 
