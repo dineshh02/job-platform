@@ -62,11 +62,6 @@ export default function JobList() {
         <span className={styles.wordmark}>JobMatch</span>
         <div className={styles.navRight}>
           {isCandidate && (
-            <button type="button" onClick={toggleSort} className={sortRelevance ? styles.navBtnActive : styles.navBtn}>
-              {sortRelevance ? '✓ Best Match' : 'Sort by Match'}
-            </button>
-          )}
-          {isCandidate && (
             <button type="button" onClick={() => navigate('/profile')} className={styles.navBtn}>My Profile</button>
           )}
           <button type="button" onClick={() => { localStorage.clear(); navigate('/login') }} className={styles.navBtn}>
@@ -77,7 +72,14 @@ export default function JobList() {
 
       <div className={styles.content}>
         <h1 className={styles.pageTitle}>Available Jobs</h1>
-        <p className={styles.pageSubtitle}>{jobs.length} position{jobs.length !== 1 ? 's' : ''} open</p>
+        <div className={styles.listHeader}>
+          <p className={styles.pageSubtitle}>{jobs.length} position{jobs.length !== 1 ? 's' : ''} open</p>
+          {isCandidate && (
+            <button type="button" onClick={toggleSort} className={sortRelevance ? styles.sortBtnActive : styles.sortBtn}>
+              {sortRelevance ? '✓ Best Match' : 'Sort by Match'}
+            </button>
+          )}
+        </div>
 
         {jobs.length === 0 && (
           <div className={styles.empty}>No jobs available yet.</div>
