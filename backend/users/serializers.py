@@ -40,4 +40,4 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CandidateProfile
-        fields = ['full_name', 'experience', 'skills', 'resume_file', 'resume_text']
+        fields = ['full_name', 'experience', 'skills', 'resume_file', 'resume_text', 'years_of_experience']

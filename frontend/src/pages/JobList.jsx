@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getJobs, applyToJob } from '../api'
+import { getJobs, applyToJob, getApplications } from '../api'
 
 export default function JobList() {
   const [jobs, setJobs] = useState([])
@@ -9,8 +9,14 @@ export default function JobList() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    getJobs()
-      .then(res => setJobs(res.data))
+    const isCandidate = localStorage.getItem('role') === 'candidate'
+    Promise.all([getJobs(), isCandidate ? getApplications() : Promise.resolve({ data: [] })])
+      .then(([jobsRes, appsRes]) => {
+        setJobs(jobsRes.data)
+        const alreadyApplied = {}
+        appsRes.data.forEach(app => { alreadyApplied[app.job] = true })
+        setApplied(alreadyApplied)
+      })
       .catch(() => { localStorage.clear(); navigate('/login') })
   }, [])
 

@@ -28,6 +28,10 @@ class JobCreateView(APIView):
 class ApplyView(APIView):
     permission_classes = [IsCandidate]
 
+    def get(self, request):
+        applications = Application.objects.filter(user=request.user)
+        return Response(ApplicationSerializer(applications, many=True).data)
+
     def post(self, request):
         serializer = ApplicationSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)

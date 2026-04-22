@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createJob, getApplications } from '../api'
+import { createJob, getApplicationsHR } from '../api'
 
 export default function HRDashboard() {
   const [form, setForm] = useState({ title: '', description: '', company: '' })
@@ -10,7 +10,7 @@ export default function HRDashboard() {
   const navigate = useNavigate()
 
   const loadApplications = () => {
-    getApplications().then(res => setApplications(res.data)).catch(() => {})
+    getApplicationsHR().then(res => setApplications(res.data)).catch(() => {})
   }
 
   useEffect(loadApplications, [])

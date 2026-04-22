@@ -4,5 +4,6 @@ djangorestframework-simplejwt
 django-cors-headers
 psycopg2-binary
 pypdf
+google-genai
 pytest
 pytest-django
