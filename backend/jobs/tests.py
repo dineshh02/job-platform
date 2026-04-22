@@ -36,25 +36,27 @@ class TestJobCreate:
     def test_hr_can_create_job(self, hr_token):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f'Bearer {hr_token}')
-        res = client.post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role', 'company': 'Acme'})
+        res = client.post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role'})
         assert res.status_code == 201
         assert res.data['title'] == 'Engineer'
+        assert res.data['company'] == 'Acme Corp'
 
     def test_created_by_set_from_token(self, hr_token, hr_user):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f'Bearer {hr_token}')
-        res = client.post(JOBS_CREATE, {'title': 'Dev', 'description': 'Cool job', 'company': 'Corp'})
+        res = client.post(JOBS_CREATE, {'title': 'Dev', 'description': 'Cool job'})
         assert res.status_code == 201
         assert res.data['created_by'] == str(hr_user)
+        assert res.data['company'] == 'Acme Corp'
 
     def test_candidate_cannot_create_job(self, candidate_token):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f'Bearer {candidate_token}')
-        res = client.post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role', 'company': 'Acme'})
+        res = client.post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role'})
         assert res.status_code == 403
 
     def test_unauthenticated_cannot_create_job(self):
-        res = APIClient().post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role', 'company': 'Acme'})
+        res = APIClient().post(JOBS_CREATE, {'title': 'Engineer', 'description': 'Great role'})
         assert res.status_code == 401
 
     def test_missing_fields_rejected(self, hr_token):

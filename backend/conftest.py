@@ -1,7 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
-from users.models import User
+from users.models import User, HRProfile
 from jobs.models import Job
 
 
@@ -12,12 +12,14 @@ def client():
 
 @pytest.fixture
 def hr_user(db):
-    return User.objects.create_user(
+    user = User.objects.create_user(
         username='hr@test.com',
         email='hr@test.com',
         password='pass1234',
         role='hr',
     )
+    HRProfile.objects.create(user=user, full_name='Test HR', company_name='Acme Corp')
+    return user
 
 
 @pytest.fixture

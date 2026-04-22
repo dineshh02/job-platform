@@ -33,7 +33,12 @@ export default function Auth() {
       const { data } = await login({ email: lEmail, password: lPw })
       localStorage.setItem('token', data.access)
       localStorage.setItem('role', data.role)
-      navigate(data.role === 'hr' ? '/dashboard' : '/jobs')
+      localStorage.setItem('is_complete', data.is_complete ? 'true' : 'false')
+      if (!data.is_complete) {
+        navigate('/profile?onboarding=1')
+      } else {
+        navigate(data.role === 'hr' ? '/dashboard' : '/jobs')
+      }
     } catch (err) {
       setLError(err.response?.data?.non_field_errors?.[0] || 'Invalid credentials.')
     } finally {
@@ -50,7 +55,12 @@ export default function Auth() {
       const { data } = await signup({ email: sEmail, password: sPw, role: sRole })
       localStorage.setItem('token', data.access)
       localStorage.setItem('role', data.role)
-      navigate(data.role === 'hr' ? '/dashboard' : '/jobs')
+      localStorage.setItem('is_complete', data.is_complete ? 'true' : 'false')
+      if (!data.is_complete) {
+        navigate('/profile?onboarding=1')
+      } else {
+        navigate(data.role === 'hr' ? '/dashboard' : '/jobs')
+      }
     } catch (err) {
       const errors = err.response?.data
       setSError(typeof errors === 'object' ? Object.values(errors).flat()[0] : 'Signup failed.')

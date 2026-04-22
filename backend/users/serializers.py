@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CandidateProfile
+from .models import User, CandidateProfile, HRProfile
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -37,7 +37,37 @@ class LoginSerializer(serializers.Serializer):
 
 class CandidateProfileSerializer(serializers.ModelSerializer):
     resume_text = serializers.CharField(read_only=True)
+    role = serializers.CharField(source='user.role', read_only=True)
+    is_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = CandidateProfile
-        fields = ['full_name', 'experience', 'skills', 'resume_file', 'resume_text', 'years_of_experience']
+        fields = [
+            'role',
+            'is_complete',
+            'full_name',
+            'experience',
+            'skills',
+            'resume_file',
+            'resume_text',
+            'years_of_experience',
+        ]
+
+    def get_is_complete(self, obj):
+        return bool(
+            (obj.full_name or '').strip()
+            and (obj.skills or '').strip()
+            and obj.resume_file
+        )
+
+
+class HRProfileSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='user.role', read_only=True)
+    is_complete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HRProfile
+        fields = ['role', 'is_complete', 'full_name', 'company_name']
+
+    def get_is_complete(self, obj):
+        return bool((obj.full_name or '').strip() and (obj.company_name or '').strip())

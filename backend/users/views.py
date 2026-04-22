@@ -1,11 +1,34 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from jobs.permissions import IsCandidate
-from .models import CandidateProfile
-from .serializers import SignupSerializer, LoginSerializer, CandidateProfileSerializer
+from jobs.models import Application
+from jobs.permissions import IsHR
+from .models import CandidateProfile, HRProfile
+from .serializers import (
+    SignupSerializer,
+    LoginSerializer,
+    CandidateProfileSerializer,
+    HRProfileSerializer,
+)
+
+User = get_user_model()
+
+
+def _profile_is_complete(user):
+    if user.role == 'hr':
+        try:
+            p = HRProfile.objects.get(user=user)
+        except HRProfile.DoesNotExist:
+            return False
+        return bool((p.full_name or '').strip() and (p.company_name or '').strip())
+    try:
+        p = CandidateProfile.objects.get(user=user)
+    except CandidateProfile.DoesNotExist:
+        return False
+    return bool((p.full_name or '').strip() and (p.skills or '').strip() and p.resume_file)
 
 
 def _token_response(user):
@@ -15,6 +38,7 @@ def _token_response(user):
         'refresh': str(refresh),
         'role': user.role,
         'email': user.email,
+        'is_complete': _profile_is_complete(user),
     }
 
 
@@ -76,13 +100,23 @@ class LoginView(APIView):
 
 
 class ProfileView(APIView):
-    permission_classes = [IsCandidate]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        if request.user.role == 'hr':
+            profile, _ = HRProfile.objects.get_or_create(user=request.user)
+            return Response(HRProfileSerializer(profile).data)
         profile, _ = CandidateProfile.objects.get_or_create(user=request.user)
         return Response(CandidateProfileSerializer(profile).data)
 
     def patch(self, request):
+        if request.user.role == 'hr':
+            profile, _ = HRProfile.objects.get_or_create(user=request.user)
+            serializer = HRProfileSerializer(profile, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            profile = serializer.save()
+            return Response(HRProfileSerializer(profile).data)
+
         profile, _ = CandidateProfile.objects.get_or_create(user=request.user)
         serializer = CandidateProfileSerializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -110,3 +144,30 @@ class ProfileView(APIView):
                 profile.save(update_fields=['resume_embedding'])
 
         return Response(CandidateProfileSerializer(profile).data)
+
+
+class CandidateHRDetailView(APIView):
+    permission_classes = [IsHR]
+
+    def get(self, request, user_id):
+        allowed = Application.objects.filter(
+            user_id=user_id,
+            job__created_by=request.user,
+        ).exists()
+        if not allowed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            candidate = User.objects.get(pk=user_id, role='candidate')
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        profile, _ = CandidateProfile.objects.get_or_create(user=candidate)
+        resume_url = profile.resume_file.url if profile.resume_file else None
+        return Response({
+            'email': candidate.email,
+            'full_name': profile.full_name,
+            'experience': profile.experience,
+            'skills': profile.skills,
+            'years_of_experience': profile.years_of_experience,
+            'resume_text': profile.resume_text,
+            'resume_url': resume_url,
+        })

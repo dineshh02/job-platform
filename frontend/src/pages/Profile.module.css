@@ -68,6 +68,16 @@
   margin-bottom: 2rem;
 }
 
+.onboardingBanner {
+  font-size: 14px;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 1rem;
+}
+
 /* ── Cards ── */
 .card {
   background: var(--color-surface);

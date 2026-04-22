@@ -22,3 +22,12 @@ class CandidateProfile(models.Model):
 
     def __str__(self):
         return f"Profile({self.user.email})"
+
+
+class HRProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hrprofile')
+    full_name = models.CharField(max_length=200, blank=True)
+    company_name = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"HRProfile({self.user.email})"

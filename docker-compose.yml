@@ -39,6 +39,9 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      # Browser must reach the API on the host (not the Docker service name).
+      VITE_API_URL: http://localhost:8000
 
 volumes:
   postgres_data:
