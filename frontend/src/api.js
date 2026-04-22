@@ -1,24 +1,48 @@
 import axios from 'axios'
 
-/** Base URL for API + media; must match where the browser can reach Django (see docker-compose). */
-export const API_BASE_URL = (
-  import.meta.env.VITE_API_URL || 'http://localhost:8000'
-).replace(/\/$/, '')
+/**
+ * API + media base URL.
+ * - If VITE_API_URL is set (non-empty), use it (direct calls to Django).
+ * - In dev with no VITE_API_URL, use '' so requests hit the Vite dev server and
+ *   vite.config.js proxies /api and /media to Django (same origin as the page → iframes work).
+ * - Production build without VITE_API_URL: same host as the page, port 8000 (adjust or set env).
+ */
+function getApiBaseUrl() {
+  const raw = import.meta.env.VITE_API_URL
+  if (raw != null && String(raw).trim() !== '') {
+    return String(raw).replace(/\/$/, '')
+  }
+  if (import.meta.env.DEV) {
+    return ''
+  }
+  if (typeof window !== 'undefined') {
+    const { protocol, hostname } = window.location
+    return `${protocol}//${hostname}:8000`
+  }
+  return 'http://localhost:8000'
+}
+
+export const API_BASE_URL = getApiBaseUrl()
 
 const api = axios.create({ baseURL: API_BASE_URL })
 
-/** Turn a relative /media/... path or any URL into a browser-loadable absolute URL for iframes/links. */
+/**
+ * Absolute URL for opening media in the browser (iframes, links).
+ * With dev proxy, paths stay relative so they load from the same origin as the app.
+ */
 export function resolveMediaUrl(pathOrUrl) {
   if (!pathOrUrl) return null
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
     try {
       const { pathname, search } = new URL(pathOrUrl)
+      if (!API_BASE_URL) return `${pathname}${search}`
       return `${API_BASE_URL}${pathname}${search}`
     } catch {
       return pathOrUrl
     }
   }
   const path = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`
+  if (!API_BASE_URL) return path
   return `${API_BASE_URL}${path}`
 }
 

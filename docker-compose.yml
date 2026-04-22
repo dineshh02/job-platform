@@ -40,8 +40,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      # Browser must reach the API on the host (not the Docker service name).
-      VITE_API_URL: http://localhost:8000
+      # Vite proxies /api and /media to the backend (browser stays on :5173 → PDF iframes work).
+      VITE_PROXY_TARGET: http://backend:8000
 
 volumes:
   postgres_data:

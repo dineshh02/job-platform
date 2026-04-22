@@ -26,32 +26,32 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         hr, hr_created = User.objects.get_or_create(
-            email='hr@demo.com',
-            defaults={'username': 'hr@demo.com', 'role': 'hr'},
+            email='admin@test.com',
+            defaults={'username': 'admin@test.com', 'role': 'hr'},
         )
         if hr_created:
-            hr.set_password('demo1234')
+            hr.set_password('Admin@1234')
             hr.save()
-            self.stdout.write('Created HR user: hr@demo.com / demo1234')
+            self.stdout.write('Created HR user: admin@test.com / Admin@1234')
 
         hr_profile, _ = HRProfile.objects.get_or_create(
             user=hr,
-            defaults={'full_name': 'Demo HR', 'company_name': 'Acme Corp'},
+            defaults={'full_name': 'Admin HR', 'company_name': 'Acme Corp'},
         )
         if not (hr_profile.company_name or '').strip():
             hr_profile.company_name = 'Acme Corp'
         if not (hr_profile.full_name or '').strip():
-            hr_profile.full_name = 'Demo HR'
+            hr_profile.full_name = 'Admin HR'
         hr_profile.save()
 
         candidate, c_created = User.objects.get_or_create(
-            email='candidate@demo.com',
-            defaults={'username': 'candidate@demo.com', 'role': 'candidate'},
+            email='user@test.com',
+            defaults={'username': 'user@test.com', 'role': 'candidate'},
         )
         if c_created:
-            candidate.set_password('demo1234')
+            candidate.set_password('User@1234')
             candidate.save()
-            self.stdout.write('Created candidate: candidate@demo.com / demo1234')
+            self.stdout.write('Created candidate: user@test.com / User@1234')
 
         company = (hr_profile.company_name or 'Acme Corp').strip()
         if not Job.objects.exists():
