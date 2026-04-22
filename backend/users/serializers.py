@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, CandidateProfile
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -33,3 +33,11 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
+
+
+class CandidateProfileSerializer(serializers.ModelSerializer):
+    resume_text = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = CandidateProfile
+        fields = ['full_name', 'experience', 'skills', 'resume_file', 'resume_text']

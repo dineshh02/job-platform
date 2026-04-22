@@ -31,7 +31,10 @@ export default function JobList() {
     <div style={s.wrap}>
       <div style={s.header}>
         <h2>Available Jobs</h2>
-        <button onClick={() => { localStorage.clear(); navigate('/login') }} style={s.logout}>Logout</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => navigate('/profile')} style={s.profileBtn}>My Profile</button>
+          <button onClick={() => { localStorage.clear(); navigate('/login') }} style={s.logout}>Logout</button>
+        </div>
       </div>
       {jobs.length === 0 && <p>No jobs available yet.</p>}
       {jobs.map(job => (
@@ -58,6 +61,7 @@ const s = {
   desc: { color: '#6b7280', fontSize: 14, margin: '0 0 12px' },
   applyBtn: { padding: '6px 16px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
   logout: { padding: '6px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
+  profileBtn: { padding: '6px 12px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
   success: { color: '#16a34a', fontWeight: 600 },
   error: { color: 'red', fontSize: 13, marginTop: 4 },
 }

@@ -14,5 +14,7 @@ export const getJobs = () => api.get('/api/jobs/')
 export const createJob = (data) => api.post('/api/jobs/create/', data)
 export const applyToJob = (jobId) => api.post('/api/applications/', { job: jobId })
 export const getApplications = () => api.get('/api/applications/list/')
+export const getProfile = () => api.get('/api/auth/profile/')
+export const saveProfile = (formData) => api.patch('/api/auth/profile/', formData)
 
 export default api
