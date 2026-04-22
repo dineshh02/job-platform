@@ -12,10 +12,14 @@ class JobSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
+    candidate_email = serializers.EmailField(source='user.email', read_only=True)
+    candidate_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    job_title = serializers.CharField(source='job.title', read_only=True)
+
     class Meta:
         model = Application
-        fields = ['id', 'job', 'status', 'applied_at']
-        read_only_fields = ['status', 'applied_at']
+        fields = ['id', 'job', 'job_title', 'status', 'applied_at', 'candidate_email', 'candidate_name']
+        read_only_fields = ['status', 'applied_at', 'candidate_email', 'candidate_name', 'job_title']
 
     def validate(self, data):
         user = self.context.get('request').user

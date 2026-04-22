@@ -14,11 +14,11 @@ class Job(models.Model):
 
 
 class Application(models.Model):
-    STATUS_CHOICES = [('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')]
+    STATUS_CHOICES = [('applied', 'Applied'), ('accepted', 'Accepted'), ('rejected', 'Rejected')]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications')
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='applied')
     applied_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

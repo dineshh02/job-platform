@@ -71,7 +71,7 @@ class TestApply:
         client.credentials(HTTP_AUTHORIZATION=f'Bearer {candidate_token}')
         res = client.post(APPLY, {'job': job.id})
         assert res.status_code == 201
-        assert res.data['status'] == 'pending'
+        assert res.data['status'] == 'applied'
 
     def test_hr_cannot_apply(self, hr_token, job):
         client = APIClient()
