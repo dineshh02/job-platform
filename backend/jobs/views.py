@@ -29,7 +29,7 @@ class ApplyView(APIView):
     permission_classes = [IsCandidate]
 
     def post(self, request):
-        serializer = ApplicationSerializer(data=request.data)
+        serializer = ApplicationSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
