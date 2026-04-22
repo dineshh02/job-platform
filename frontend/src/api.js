@@ -1,11 +1,10 @@
 import axios from 'axios'
 
 /**
- * API + media base URL.
- * - If VITE_API_URL is set (non-empty), use it (direct calls to Django).
- * - In dev with no VITE_API_URL, use '' so requests hit the Vite dev server and
- *   vite.config.js proxies /api and /media to Django (same origin as the page → iframes work).
- * - Production build without VITE_API_URL: same host as the page, port 8000 (adjust or set env).
+ * API + media base URL — works locally and when deployed:
+ * - Local dev (no VITE_API_URL): '' → axios hits the Vite origin; vite.config.js proxies /api and /media.
+ * - Deployed (set VITE_API_URL at build): points at Django for API + resolveMediaUrl() for PDF iframes.
+ * - Preview/build without VITE_API_URL: fall back to same hostname :8000 (optional local preview).
  */
 function getApiBaseUrl() {
   const raw = import.meta.env.VITE_API_URL
@@ -57,15 +56,19 @@ function toPathnameSearch(pathOrUrl) {
 }
 
 /**
- * URL for iframes / links to user-uploaded media. Uses same document origin
- * (e.g. :5173 with Vite proxy to Django) so embeds are not hard-coded to
- * localhost:8000 or an internal Docker hostname.
+ * URL for iframes / links to user-uploaded media.
+ * - Dev (no VITE_API_URL): relative /media/... so Vite proxies to Django (same origin).
+ * - Prod (VITE_API_URL set): absolute URL on the API host — static hosts do not serve /media.
  */
 export function resolveMediaUrl(pathOrUrl) {
   const p = toPathnameSearch(pathOrUrl)
   if (p == null) return null
   if (p.startsWith('/media/') || p.startsWith('/static/')) {
     if (typeof window !== 'undefined') {
+      const base = API_BASE_URL.replace(/\/$/, '')
+      if (base) {
+        return `${base}${p}`
+      }
       return p
     }
   }

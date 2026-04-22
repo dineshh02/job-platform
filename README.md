@@ -37,6 +37,14 @@ When the containers are up:
 | Admin     | http://localhost:8000/admin/                   |
 | Postgres  | localhost:5432 (inside Docker network as `db`) |
 
+### Live demo (deployed)
+
+| Environment | URL |
+| ----------- | --- |
+| Production (Render) | [https://job-platform-oaec.onrender.com/](https://job-platform-oaec.onrender.com/) |
+
+
+
 ### Test Credentials (auto‑seeded on first boot)
 
 | Role      | Email            | Password    |
