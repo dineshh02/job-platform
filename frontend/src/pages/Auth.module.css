@@ -1,0 +1,260 @@
+.page {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background: var(--color-nav);
+}
+
+/* ── Panels ── */
+.panelActive {
+  flex: 1;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: flex 0.35s ease, background 0.35s ease;
+  min-width: 0;
+}
+
+.panelDim {
+  flex: 0 0 200px;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: flex 0.35s ease, background 0.35s ease;
+  min-width: 0;
+}
+
+.panelDim:hover {
+  background: #181818;
+}
+
+.divider {
+  width: 1px;
+  background: #222;
+  flex-shrink: 0;
+}
+
+/* ── Form wrap ── */
+.formWrap {
+  width: 100%;
+  max-width: 360px;
+  padding: 0 2rem;
+}
+
+.wordmark {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  margin-bottom: 36px;
+}
+
+.heading {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.subheading {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 28px;
+}
+
+/* ── Form fields ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.input:focus {
+  border-color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.pwRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pwInput {
+  padding-right: 56px;
+}
+
+.eye {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0;
+  line-height: 1;
+}
+
+.eye:hover {
+  color: #333;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 13px;
+  background: var(--color-text);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  letter-spacing: 0.01em;
+  transition: background 0.15s;
+}
+
+.submitBtn:hover {
+  background: #222;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Role chips ── */
+.roleLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.chipRow {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  flex: 1;
+  padding: 10px 0;
+  background: var(--color-surface);
+  border: 1.5px solid #e0e0e0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.chip:hover {
+  border-color: #bbb;
+  color: #333;
+}
+
+.chipActive {
+  flex: 1;
+  padding: 10px 0;
+  background: var(--color-text);
+  border: 1.5px solid var(--color-text);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--color-surface);
+}
+
+/* ── Feedback ── */
+.error {
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.switchHint {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.switchLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.switchLink:hover {
+  color: #333;
+}
+
+/* ── Dim panel ── */
+.dimContent {
+  text-align: center;
+  padding: 0 1.5rem;
+  user-select: none;
+}
+
+.dimLabel {
+  font-size: 20px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.dimSub {
+  font-size: 12px;
+  color: #3a3a3a;
+  margin-bottom: 12px;
+}
+
+.dimCta {
+  font-size: 11px;
+  color: #444;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api'
+import styles from './SimpleAuth.module.css'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -22,23 +23,15 @@ export default function Login() {
   }
 
   return (
-    <div style={s.wrap}>
-      <h2>Login</h2>
-      {error && <p style={s.error}>{error}</p>}
-      <form onSubmit={handleSubmit} style={s.form}>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={s.input} required />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} style={s.input} required />
-        <button type="submit" style={s.btn}>Login</button>
+    <div className={styles.wrap}>
+      <h2 className={styles.title}>Login</h2>
+      {error && <p className={styles.error}>{error}</p>}
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className={styles.input} required />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className={styles.input} required />
+        <button type="submit" className={styles.btn}>Login</button>
       </form>
-      <p>No account? <Link to="/signup">Sign up</Link></p>
+      <p className={styles.footer}>No account? <Link to="/signup">Sign up</Link></p>
     </div>
   )
-}
-
-const s = {
-  wrap: { maxWidth: 380, margin: '80px auto', fontFamily: 'sans-serif', padding: '0 1rem' },
-  form: { display: 'flex', flexDirection: 'column', gap: 12 },
-  input: { padding: '8px 12px', fontSize: 14, border: '1px solid #ccc', borderRadius: 4 },
-  btn: { padding: 10, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
-  error: { color: 'red', fontSize: 13 },
 }

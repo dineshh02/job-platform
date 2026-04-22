@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { signup } from '../api'
+import styles from './SimpleAuth.module.css'
 
 export default function Signup() {
   const [form, setForm] = useState({ email: '', password: '', role: 'candidate' })
@@ -24,27 +25,19 @@ export default function Signup() {
   const set = f => e => setForm({ ...form, [f]: e.target.value })
 
   return (
-    <div style={s.wrap}>
-      <h2>Create Account</h2>
-      {error && <p style={s.error}>{error}</p>}
-      <form onSubmit={handleSubmit} style={s.form}>
-        <input type="email" placeholder="Email" value={form.email} onChange={set('email')} style={s.input} required />
-        <input type="password" placeholder="Password (min 8 chars)" value={form.password} onChange={set('password')} style={s.input} required />
-        <select value={form.role} onChange={set('role')} style={s.input}>
+    <div className={styles.wrap}>
+      <h2 className={styles.title}>Create Account</h2>
+      {error && <p className={styles.error}>{error}</p>}
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input type="email" placeholder="Email" value={form.email} onChange={set('email')} className={styles.input} required />
+        <input type="password" placeholder="Password (min 8 chars)" value={form.password} onChange={set('password')} className={styles.input} required />
+        <select value={form.role} onChange={set('role')} className={styles.input}>
           <option value="candidate">Candidate</option>
           <option value="hr">HR</option>
         </select>
-        <button type="submit" style={s.btn}>Sign Up</button>
+        <button type="submit" className={styles.btn}>Sign Up</button>
       </form>
-      <p>Have an account? <Link to="/login">Login</Link></p>
+      <p className={styles.footer}>Have an account? <Link to="/login">Login</Link></p>
     </div>
   )
-}
-
-const s = {
-  wrap: { maxWidth: 380, margin: '80px auto', fontFamily: 'sans-serif', padding: '0 1rem' },
-  form: { display: 'flex', flexDirection: 'column', gap: 12 },
-  input: { padding: '8px 12px', fontSize: 14, border: '1px solid #ccc', borderRadius: 4 },
-  btn: { padding: 10, background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
-  error: { color: 'red', fontSize: 13 },
 }

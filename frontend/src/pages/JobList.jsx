@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getJobs, applyToJob, getApplications } from '../api'
+import styles from './JobList.module.css'
 
-function scoreBadge(score) {
-  const bg = score >= 70 ? '#dcfce7' : score >= 40 ? '#fef9c3' : '#f3f4f6'
-  const color = score >= 70 ? '#15803d' : score >= 40 ? '#854d0e' : '#6b7280'
-  return { display: 'inline-block', padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: bg, color, marginBottom: 8 }
+function matchBadgeVariant(score) {
+  if (score >= 70) return 'high'
+  if (score >= 40) return 'mid'
+  return 'low'
+}
+
+const badgeVariantClass = {
+  high: styles.badgeHigh,
+  mid: styles.badgeMid,
+  low: styles.badgeLow,
 }
 
 export default function JobList() {
@@ -50,52 +57,63 @@ export default function JobList() {
   }
 
   return (
-    <div style={s.wrap}>
-      <div style={s.header}>
-        <h2>Available Jobs</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+    <div className={styles.page}>
+      <nav className={styles.nav}>
+        <span className={styles.wordmark}>JobMatch</span>
+        <div className={styles.navRight}>
           {isCandidate && (
-            <button onClick={toggleSort} style={sortRelevance ? s.sortActive : s.sortBtn}>
+            <button type="button" onClick={toggleSort} className={sortRelevance ? styles.navBtnActive : styles.navBtn}>
               {sortRelevance ? '✓ Best Match' : 'Sort by Match'}
             </button>
           )}
-          {isCandidate && <button onClick={() => navigate('/profile')} style={s.profileBtn}>My Profile</button>}
-          <button onClick={() => { localStorage.clear(); navigate('/login') }} style={s.logout}>Logout</button>
+          {isCandidate && (
+            <button type="button" onClick={() => navigate('/profile')} className={styles.navBtn}>My Profile</button>
+          )}
+          <button type="button" onClick={() => { localStorage.clear(); navigate('/login') }} className={styles.navBtn}>
+            Logout
+          </button>
         </div>
+      </nav>
+
+      <div className={styles.content}>
+        <h1 className={styles.pageTitle}>Available Jobs</h1>
+        <p className={styles.pageSubtitle}>{jobs.length} position{jobs.length !== 1 ? 's' : ''} open</p>
+
+        {jobs.length === 0 && (
+          <div className={styles.empty}>No jobs available yet.</div>
+        )}
+
+        {jobs.map(job => {
+          const variant = job.match_score !== null && job.match_score !== undefined
+            ? matchBadgeVariant(job.match_score)
+            : null
+          return (
+            <div key={job.id} className={styles.card}>
+              <div className={styles.cardTop}>
+                <div>
+                  <h2 className={styles.jobTitle}>{job.title}</h2>
+                  <p className={styles.company}>{job.company}</p>
+                </div>
+                {variant && (
+                  <span className={`${styles.badge} ${badgeVariantClass[variant]}`}>
+                    {job.match_score}% match
+                  </span>
+                )}
+              </div>
+              <p className={styles.desc}>{job.description}</p>
+              <div className={styles.cardFooter}>
+                {applied[job.id]
+                  ? <span className={styles.appliedTag}>✓ Applied</span>
+                  : isCandidate && (
+                    <button type="button" onClick={() => handleApply(job.id)} className={styles.applyBtn}>Apply</button>
+                  )
+                }
+                {errors[job.id] && <p className={styles.error}>{errors[job.id]}</p>}
+              </div>
+            </div>
+          )
+        })}
       </div>
-      {jobs.length === 0 && <p>No jobs available yet.</p>}
-      {jobs.map(job => (
-        <div key={job.id} style={s.card}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <h3 style={{ margin: '0 0 4px' }}>{job.title}</h3>
-            {job.match_score !== null && job.match_score !== undefined && (
-              <span style={scoreBadge(job.match_score)}>{job.match_score}% match</span>
-            )}
-          </div>
-          <p style={s.company}>{job.company}</p>
-          <p style={s.desc}>{job.description}</p>
-          {applied[job.id]
-            ? <span style={s.success}>✓ Applied</span>
-            : isCandidate && <button onClick={() => handleApply(job.id)} style={s.applyBtn}>Apply</button>
-          }
-          {errors[job.id] && <p style={s.error}>{errors[job.id]}</p>}
-        </div>
-      ))}
     </div>
   )
-}
-
-const s = {
-  wrap: { maxWidth: 680, margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  card: { border: '1px solid #e5e7eb', borderRadius: 6, padding: '1rem', marginBottom: '1rem' },
-  company: { color: '#2563eb', margin: '0 0 8px', fontWeight: 500 },
-  desc: { color: '#6b7280', fontSize: 14, margin: '0 0 12px' },
-  applyBtn: { padding: '6px 16px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
-  logout: { padding: '6px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
-  profileBtn: { padding: '6px 12px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' },
-  sortBtn: { padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: 4, cursor: 'pointer' },
-  sortActive: { padding: '6px 12px', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: 4, cursor: 'pointer', fontWeight: 600 },
-  success: { color: '#16a34a', fontWeight: 600 },
-  error: { color: 'red', fontSize: 13, marginTop: 4 },
 }
