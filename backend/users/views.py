@@ -60,9 +60,16 @@ def parse_resume_with_gemini(text):
         return {}
     client = genai.Client(api_key=api_key)
     prompt = (
-        'Extract the following from this resume text and return ONLY valid JSON '
-        'with keys: full_name (string), years_of_experience (integer), skills (comma-separated string).\n\n'
-        + text[:4000]
+        'Extract the following from this resume text and return ONLY valid JSON with keys:\n'
+        '- full_name (string)\n'
+        '- years_of_experience (integer, total years of professional work experience)\n'
+        '- skills (comma-separated string)\n'
+        '- experience (string): a concise multi-line summary of the candidate\'s work '
+        'history. For each role include company, title, dates, and 1-3 short bullet points '
+        'about responsibilities/impact. Separate roles with a blank line. Plain text only, '
+        'no markdown.\n\n'
+        'Resume text:\n'
+        + text[:6000]
     )
     try:
         response = client.models.generate_content(
@@ -131,7 +138,7 @@ class ProfileView(APIView):
             parsed = parse_resume_with_gemini(profile.resume_text)
             if parsed:
                 update_fields = []
-                for field in ('full_name', 'years_of_experience', 'skills'):
+                for field in ('full_name', 'years_of_experience', 'skills', 'experience'):
                     val = parsed.get(field)
                     if val is not None:
                         setattr(profile, field, val)
